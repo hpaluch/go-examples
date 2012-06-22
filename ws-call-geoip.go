@@ -15,6 +15,7 @@ package main
 import (
 	"encoding/xml"
 	"net/http"
+	"net/url"
 	"io/ioutil"
 	"fmt"
 )
@@ -35,7 +36,7 @@ func deSerializeXML(data []byte) (*GeoIPResponse,error) {
 }
 
 func HPGetGeoIP( ip string) (*GeoIPResponse,error){
-    url := "http://www.webservicex.net/geoipservice.asmx/GetGeoIP?IPAddress="+ip
+    url := "http://www.webservicex.net/geoipservice.asmx/GetGeoIP?IPAddress="+url.QueryEscape(ip)
     resp,err := http.Get(url)
     if err!=nil {
 	    return nil,err
@@ -55,7 +56,7 @@ func main(){
 	addresses := []string{"8.8.4.4","194.79.52.192","134.76.12.3","213.180.204.46"}
 	for _,ip := range addresses {
 		v,err := HPGetGeoIP(ip)
-		if (err!=nil){
+		if err!=nil {
 			panic(fmt.Sprintln("Error on GetGeoIP",err))
 		}
 		fmt.Printf("IP %15s (%d,%s) %s %s\n",v.IP,v.ReturnCode,v.ReturnCodeDetails,v.CountryName,v.CountryCode)
